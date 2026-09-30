@@ -4,11 +4,16 @@ namespace Calculatrice;
 
 public partial class MainPage : ContentPage
 {
-    // Etat de la calculatrice
+    // Nombre maximum de chiffres saisissables 
+    const int MaxDigits = 12;
+
+    // Etat de la calculatrice 
     string currentInput = "0";       
     double? firstOperand = null;     
     string? selectedOperator = null; 
     bool isNewInput = true;          
+    bool hasError = false;           
+
     public MainPage()
     {
         InitializeComponent();
@@ -22,16 +27,31 @@ public partial class MainPage : ContentPage
         return value.ToString("G12", CultureInfo.InvariantCulture);
     }
 
-    // Transforme le texte affiché en nombre 
+    // Transforme le texte affiché en nombre
     static double Parse(string text)
     {
         return double.Parse(text, CultureInfo.InvariantCulture);
     }
 
-    // Exécution du calcul 
-    static double Calculate(double a, double b, string op)
+    // Effectue le calcul et renvoie false si le calcul est impossible
+    static bool TryCalculate(double a, double b, string op, out double result, out string error)
     {
-        return op switch
+        result = 0;
+        error = "";
+
+        if (op == "÷" && b == 0)
+        {
+            error = "Division par zéro impossible";
+            return false;
+        }
+
+        if (op == "%" && b == 0)
+        {
+            error = "Modulo par zéro impossible";
+            return false;
+        }
+
+        result = op switch
         {
             "+" => a + b,
             "−" => a - b,
@@ -40,31 +60,55 @@ public partial class MainPage : ContentPage
             "%" => a % b,
             _ => b
         };
+
+        if (double.IsInfinity(result) || double.IsNaN(result))
+        {
+            error = "Résultat trop grand";
+            return false;
+        }
+
+        return true;
     }
 
-    // Permet la mise à jour des deux zones d'affichage liées à l'état
+    // Permet de mettre à jour les deux zones d'affichage liées a l'état
     void UpdateDisplay()
     {
         ResultLabel.Text = currentInput;
         OperatorLabel.Text = selectedOperator ?? "—";
     }
 
-    // Remise à zero 
+    // Remise a zero
     void ResetAll()
     {
         currentInput = "0";
         firstOperand = null;
         selectedOperator = null;
         isNewInput = true;
+        hasError = false;
         OperationLabel.Text = "";
         UpdateDisplay();
     }
 
-    // Evènements liés aux touches du clavier
+    // Permet l'affichage d'erreur sans faire planter la calculatrice
+    void ShowError(string message)
+    {
+        currentInput = "0";
+        firstOperand = null;
+        selectedOperator = null;
+        isNewInput = true;
+        hasError = true;
+        ResultLabel.Text = "Erreur";
+        OperationLabel.Text = message;
+        OperatorLabel.Text = "—";
+    }
+
+    // Evènements liés aux touches de la calculatrice
+
     // Touches de 0 à 9
     void OnDigitClicked(object? sender, EventArgs e)
     {
         if (sender is not Button button) return;
+        if (hasError) ResetAll();
 
         string digit = button.Text;
 
@@ -76,6 +120,9 @@ public partial class MainPage : ContentPage
         }
         else
         {
+            int digitCount = currentInput.Count(char.IsDigit);
+            if (digitCount >= MaxDigits) return;
+
             currentInput = currentInput == "0" ? digit : currentInput + digit;
         }
 
@@ -85,6 +132,8 @@ public partial class MainPage : ContentPage
     // Touche .
     void OnDecimalClicked(object? sender, EventArgs e)
     {
+        if (hasError) ResetAll();
+
         if (isNewInput)
         {
             if (selectedOperator == null) OperationLabel.Text = "";
@@ -99,14 +148,14 @@ public partial class MainPage : ContentPage
         UpdateDisplay();
     }
 
-    // Touches + − × ÷ %
+    // Touches + − × ÷ % 
     void OnOperatorClicked(object? sender, EventArgs e)
     {
-        if (sender is not Button button) return;
+        if (sender is not Button button || hasError) return;
 
         string op = button.Text;
 
-        // Si deux operateurs de suite sont cliqués alors on remplace le precedent
+        // Si l'on clique sur deux operateurs de suite alors on remplace le précedent
         if (selectedOperator != null && isNewInput)
         {
             selectedOperator = op;
@@ -120,8 +169,14 @@ public partial class MainPage : ContentPage
         // Enchainement (2 + 3 + ...) : on calcule d'abord le resultat en cours
         if (selectedOperator != null && firstOperand != null)
         {
-            current = Calculate(firstOperand.Value, current, selectedOperator);
-            currentInput = Format(current);
+            if (!TryCalculate(firstOperand.Value, current, selectedOperator, out double result, out string error))
+            {
+                ShowError(error);
+                return;
+            }
+
+            current = result;
+            currentInput = Format(result);
         }
 
         firstOperand = current;
@@ -134,11 +189,16 @@ public partial class MainPage : ContentPage
     // Touche =
     void OnEqualsClicked(object? sender, EventArgs e)
     {
-        // Si rien à calculer (pas d'opération, ou pas de deuxième nombre)
-        if (selectedOperator == null || firstOperand == null || isNewInput) return;
+        // Si rien a calculer c'est à dire pas d'opération, ou pas de deuxième nombre 
+        if (hasError || selectedOperator == null || firstOperand == null || isNewInput) return;
 
         double second = Parse(currentInput);
-        double result = Calculate(firstOperand.Value, second, selectedOperator);
+
+        if (!TryCalculate(firstOperand.Value, second, selectedOperator, out double result, out string error))
+        {
+            ShowError(error);
+            return;
+        }
 
         OperationLabel.Text = $"{Format(firstOperand.Value)} {selectedOperator} {Format(second)} =";
         currentInput = Format(result);
@@ -154,9 +214,15 @@ public partial class MainPage : ContentPage
         ResetAll();
     }
 
-    // Touche ⌫
+    // Touche *
     void OnBackspaceClicked(object? sender, EventArgs e)
     {
+        if (hasError)
+        {
+            ResetAll();
+            return;
+        }
+
         // On n'efface pas un resultat ni un nombre memorise 
         if (isNewInput) return;
 
@@ -169,11 +235,11 @@ public partial class MainPage : ContentPage
     // Touche ±
     void OnSignClicked(object? sender, EventArgs e)
     {
-        if (currentInput == "0") return;
+        if (hasError || currentInput == "0") return;
 
         currentInput = currentInput.StartsWith('-') ? currentInput[1..] : "-" + currentInput;
 
-        // Si une operation est en attente le nombre affiché devient le deuxième nombre
+        // Si une opération est en attente, le nombre affiché devient le deuxième nombre
         if (selectedOperator != null) isNewInput = false;
 
         UpdateDisplay();

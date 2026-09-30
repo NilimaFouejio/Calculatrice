@@ -1,24 +1,23 @@
-﻿namespace Calculatrice
+﻿namespace Calculatrice;
+
+public partial class MainPage : ContentPage
 {
-    public partial class MainPage : ContentPage
+    public MainPage()
     {
-        int count = 0;
-
-        public MainPage()
-        {
-            InitializeComponent();
-        }
-
-        private void OnCounterClicked(object? sender, EventArgs e)
-        {
-            count++;
-
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
-        }
+        InitializeComponent();
     }
+
+    void OnDigitClicked(object? sender, EventArgs e) { }
+
+    void OnDecimalClicked(object? sender, EventArgs e) { }
+
+    void OnOperatorClicked(object? sender, EventArgs e) { }
+
+    void OnEqualsClicked(object? sender, EventArgs e) { }
+
+    void OnClearClicked(object? sender, EventArgs e) { }
+
+    void OnBackspaceClicked(object? sender, EventArgs e) { }
+
+    void OnSignClicked(object? sender, EventArgs e) { }
 }

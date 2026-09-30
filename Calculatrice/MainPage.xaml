@@ -23,6 +23,16 @@
         <Color x:Key="OperatorColor">#7C3AED</Color>
         <Color x:Key="EqualsColor">#06B6D4</Color>
 
+        <!-- Couleurs au survol de la souris (Hover) et pendant le clic (Pressed) -->
+        <Color x:Key="NumberHover">#344765</Color>
+        <Color x:Key="NumberPressed">#1A2332</Color>
+        <Color x:Key="FunctionHover">#716AEA</Color>
+        <Color x:Key="FunctionPressed">#3127E1</Color>
+        <Color x:Key="OperatorHover">#955FF0</Color>
+        <Color x:Key="OperatorPressed">#6619EA</Color>
+        <Color x:Key="EqualsHover">#0BD6F8</Color>
+        <Color x:Key="EqualsPressed">#0598B1</Color>
+
         <!-- Style commun aux touches du clavier -->
         <Style x:Key="KeyBase" TargetType="Button">
             <Setter Property="FontSize" Value="26" />
@@ -30,25 +40,109 @@
             <Setter Property="Padding" Value="0" />
         </Style>
 
-        <!-- style pour chaque touche -->
+        <!-- style pour chaque touche (avec 3 états : Normal, PointerOver = survol souris, Pressed = clic) -->
         <Style x:Key="NumberKey" TargetType="Button" BasedOn="{StaticResource KeyBase}">
             <Setter Property="BackgroundColor" Value="{StaticResource NumberColor}" />
             <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource NumberColor}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="PointerOver">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource NumberHover}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Pressed">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource NumberPressed}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
         </Style>
 
         <Style x:Key="FunctionKey" TargetType="Button" BasedOn="{StaticResource KeyBase}">
             <Setter Property="BackgroundColor" Value="{StaticResource FunctionColor}" />
             <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource FunctionColor}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="PointerOver">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource FunctionHover}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Pressed">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource FunctionPressed}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
         </Style>
 
         <Style x:Key="OperatorKey" TargetType="Button" BasedOn="{StaticResource KeyBase}">
             <Setter Property="BackgroundColor" Value="{StaticResource OperatorColor}" />
             <Setter Property="TextColor" Value="{StaticResource DarkText}" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource OperatorColor}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="PointerOver">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource OperatorHover}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Pressed">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource OperatorPressed}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
         </Style>
 
         <Style x:Key="EqualsKey" TargetType="Button" BasedOn="{StaticResource KeyBase}">
             <Setter Property="BackgroundColor" Value="{StaticResource EqualsColor}" />
             <Setter Property="TextColor" Value="{StaticResource DarkText}" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource EqualsColor}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="PointerOver">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource EqualsHover}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Pressed">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource EqualsPressed}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
         </Style>
     </ContentPage.Resources>
 
@@ -135,3 +229,4 @@
         </Grid>
     </Grid>
 </ContentPage>
+ 
